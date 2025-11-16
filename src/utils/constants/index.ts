@@ -6,7 +6,13 @@ type NavLink = {
 };
 
 export const NAV_LINKS = [
-  { href: "/about", title: "About" },
-  { href: "/contact", title: "Contact" },
-  { href: "/blog", title: "Blog" },
+  { href: "/products", title: "Products" },
 ] satisfies NavLink[];
+
+// Currency formatting utility
+export const formatCurrency = (amount: number, currency: string = "USD"): string => {
+  if (currency === "RWF") {
+    return `${amount.toLocaleString()} Fr`;
+  }
+  return `$${amount.toLocaleString()}`;
+};

@@ -2,9 +2,23 @@ import { NextConfig } from "next";
 
 const nextConfig = {
   experimental: {
-    reactCompiler: true,
+    reactCompiler: false,
   },
-  ppr: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "api.dicebear.com",
+      },
+    ],
+  },
 } satisfies NextConfig;
 
 export default nextConfig;

@@ -21,7 +21,7 @@ export function ContainerWrapper({
   return (
     <div
       className={cn(
-        "mx-auto size-full max-w-6xl",
+        "mx-auto size-full max-w-7xl",
         "px-4 sm:px-6 lg:px-8",
         "border-x",
         className,
