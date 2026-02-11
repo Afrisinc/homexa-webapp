@@ -30,7 +30,6 @@ jobs:
       - name: Build Docker image
         run: |
           docker build \
-            --build-arg VITE_API_URL=${{ secrets.VITE_API_URL }} \
             -t ghcr.io/${{ secrets.GHCR_OWNER }}/homexa-webapp:latest .
 
       # Step 4: Push Docker image to GHCR

@@ -13,7 +13,7 @@ import { useApi } from './use-api';
  * Hook for authentication operations
  */
 export function useAuth() {
-  const { user, isAuthenticated, login: loginStore, logout: logoutStore } = useAuthStore();
+  const { user, isAuthenticated, setUser, logout: logoutStore } = useAuthStore();
 
   const loginApi = useApi(authService.login);
   const registerApi = useApi(authService.register);
@@ -23,22 +23,22 @@ export function useAuth() {
     async (credentials: LoginCredentials) => {
       const result = await loginApi.execute(credentials);
       if (result) {
-        loginStore(result.user, result.token);
+        setUser(result.user);
       }
       return result;
     },
-    [loginApi.execute, loginStore]
+    [loginApi.execute, setUser]
   );
 
   const register = useCallback(
     async (data: RegisterData) => {
       const result = await registerApi.execute(data);
       if (result) {
-        loginStore(result.user, result.token);
+        setUser(result.user);
       }
       return result;
     },
-    [registerApi.execute, loginStore]
+    [registerApi.execute, setUser]
   );
 
   const logout = useCallback(async () => {
