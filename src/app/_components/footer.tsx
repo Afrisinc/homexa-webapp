@@ -14,7 +14,7 @@ export default function Footer() {
             <div>
               <div className="mb-4 flex items-center gap-2">
                 <ShoppingBag className="h-5 w-5 text-primary" />
-                <h3 className="font-bold">Marketplace</h3>
+                <h3 className="font-bold">Office HomeTechx</h3>
               </div>
               <p className="text-sm text-muted-foreground">
                 Your trusted platform for buying and selling quality products from verified sellers worldwide.

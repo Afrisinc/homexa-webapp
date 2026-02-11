@@ -54,7 +54,7 @@ export default function Navbar() {
         <div className="flex size-full items-center gap-4">
           <Link className="flex items-center gap-2 font-bold text-lg" href="/">
             <ShoppingBag className="h-6 w-6 text-primary" />
-            <span className="hidden sm:inline">Marketplace</span>
+            <span className="hidden sm:inline">Office HomeTechX</span>
             <VisuallyHidden>logo</VisuallyHidden>
           </Link>
 
