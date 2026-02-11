@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,10 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown, X, Check } from "lucide-react";
 import { FilterOptions } from "@/lib/types";
 import { getBrands, getModelsByBrand, getPriceRangeByCurrency, getCurrencies } from "@/data/products";
 import { formatCurrency } from "@/utils/constants";
+import { categories } from "@/data/categories";
 
 interface FilterPanelProps {
   filters: FilterOptions;
@@ -34,6 +36,16 @@ export function FilterPanel({
   );
   const [selectedModel, setSelectedModel] = useState<string | undefined>(
     filters.model
+  );
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
+    filters.categoryId
+  );
+  const [location, setLocation] = useState<string | undefined>(filters.location);
+  const [verifiedOnly, setVerifiedOnly] = useState<boolean>(
+    filters.verifiedSellersOnly ?? false
+  );
+  const [availability, setAvailability] = useState<"all" | "in-stock" | "out-of-stock">(
+    filters.availability ?? "all"
   );
 
   // Get dynamic price range based on selected currency
@@ -58,6 +70,10 @@ export function FilterPanel({
     setSelectedCurrency(filters.currency);
     setSelectedBrand(filters.brand);
     setSelectedModel(filters.model);
+    setSelectedCategory(filters.categoryId);
+    setLocation(filters.location);
+    setVerifiedOnly(filters.verifiedSellersOnly ?? false);
+    setAvailability(filters.availability ?? "all");
   }, [filters, priceConfig]);
 
   const handlePriceChange = (value: number[]) => {
@@ -108,6 +124,10 @@ export function FilterPanel({
     setSelectedCurrency(undefined);
     setSelectedBrand(undefined);
     setSelectedModel(undefined);
+    setSelectedCategory(undefined);
+    setLocation(undefined);
+    setVerifiedOnly(false);
+    setAvailability("all");
     onFilterChange({});
   };
 
@@ -116,7 +136,11 @@ export function FilterPanel({
     filters.priceMax !== undefined ||
     filters.currency ||
     filters.brand ||
-    filters.model;
+    filters.model ||
+    filters.categoryId ||
+    filters.location ||
+    filters.verifiedSellersOnly ||
+    filters.availability;
 
   return (
     <Card className={className}>
@@ -285,6 +309,151 @@ export function FilterPanel({
             </DropdownMenu>
           </div>
         )}
+
+        {/* Category */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium">Category</label>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-between"
+                aria-label="Select category"
+              >
+                <span className="truncate">
+                  {selectedCategory
+                    ? categories.find((c) => c.id === selectedCategory)?.name
+                    : "All Categories"}
+                </span>
+                <ChevronDown className="ml-2 h-4 w-4 shrink-0" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="start">
+              <DropdownMenuItem
+                onSelect={() => {
+                  setSelectedCategory(undefined);
+                  onFilterChange({
+                    ...filters,
+                    categoryId: undefined,
+                  });
+                }}
+              >
+                All Categories
+              </DropdownMenuItem>
+              {categories.map((category) => (
+                <DropdownMenuItem
+                  key={category.id}
+                  onSelect={() => {
+                    setSelectedCategory(category.id);
+                    onFilterChange({
+                      ...filters,
+                      categoryId: category.id,
+                    });
+                  }}
+                >
+                  {category.name}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Location */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium">Location</label>
+          <Input
+            placeholder="Enter location..."
+            value={location || ""}
+            onChange={(e) => {
+              const value = e.target.value || undefined;
+              setLocation(value);
+              onFilterChange({
+                ...filters,
+                location: value,
+              });
+            }}
+            className="text-sm"
+          />
+        </div>
+
+        {/* Verified Sellers Only */}
+        <div className="space-y-3">
+          <button
+            onClick={() => {
+              const newValue = !verifiedOnly;
+              setVerifiedOnly(newValue);
+              onFilterChange({
+                ...filters,
+                verifiedSellersOnly: newValue || undefined,
+              });
+            }}
+            className="flex items-center gap-3 w-full rounded-md border border-input px-3 py-2 hover:bg-accent transition-colors"
+            aria-label="Filter by verified sellers only"
+          >
+            <div className={`flex h-5 w-5 items-center justify-center rounded border ${verifiedOnly ? 'bg-primary border-primary' : 'border-input'}`}>
+              {verifiedOnly && <Check className="h-3 w-3 text-primary-foreground" />}
+            </div>
+            <span className="text-sm font-medium">Verified Sellers Only</span>
+          </button>
+        </div>
+
+        {/* Availability */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium">Availability</label>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-between"
+                aria-label="Select availability"
+              >
+                <span className="truncate">
+                  {availability === "in-stock"
+                    ? "In Stock"
+                    : availability === "out-of-stock"
+                    ? "Out of Stock"
+                    : "All Products"}
+                </span>
+                <ChevronDown className="ml-2 h-4 w-4 shrink-0" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="start">
+              <DropdownMenuItem
+                onSelect={() => {
+                  setAvailability("all");
+                  onFilterChange({
+                    ...filters,
+                    availability: undefined,
+                  });
+                }}
+              >
+                All Products
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => {
+                  setAvailability("in-stock");
+                  onFilterChange({
+                    ...filters,
+                    availability: "in-stock",
+                  });
+                }}
+              >
+                In Stock
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => {
+                  setAvailability("out-of-stock");
+                  onFilterChange({
+                    ...filters,
+                    availability: "out-of-stock",
+                  });
+                }}
+              >
+                Out of Stock
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </CardContent>
     </Card>
   );

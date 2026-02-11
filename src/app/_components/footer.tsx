@@ -14,7 +14,7 @@ export default function Footer() {
             <div>
               <div className="mb-4 flex items-center gap-2">
                 <ShoppingBag className="h-5 w-5 text-primary" />
-                <h3 className="font-bold">Office HomeTechx</h3>
+                <h3 className="font-bold">Homexa</h3>
               </div>
               <p className="text-sm text-muted-foreground">
                 Your trusted platform for buying and selling quality products from verified sellers worldwide.
@@ -31,8 +31,13 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="text-muted-foreground hover:text-foreground transition-colors">
-                    Seller Dashboard
+                  <Link href="/products?tab=sellers" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Browse Sellers
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/become-seller" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Become a Seller
                   </Link>
                 </li>
               </ul>

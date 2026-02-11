@@ -27,8 +27,9 @@ interface RequestConfig extends RequestInit {
 class ApiClient {
   private baseUrl: string;
 
-  constructor(baseUrl: string = '/api') {
-    this.baseUrl = baseUrl;
+  constructor(baseUrl?: string) {
+    // Use environment variable for backend URL if available, otherwise use local API
+    this.baseUrl = baseUrl || process.env.NEXT_PUBLIC_API_URL || '/api';
   }
 
   /**
