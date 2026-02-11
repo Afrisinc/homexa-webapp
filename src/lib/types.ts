@@ -37,6 +37,11 @@ export interface Seller {
   totalSales: number;
   responseRate: number;
   verified: boolean;
+  location?: string;
+  createdAt?: string;
+  description?: string;
+  businessType?: "wholesaler" | "retailer" | "manufacturer";
+  certifications?: string[];
 }
 
 export interface Message {
@@ -75,4 +80,7 @@ export interface FilterOptions {
   model?: string;
   categoryId?: string;
   q?: string;
+  verifiedSellersOnly?: boolean;
+  location?: string;
+  availability?: "all" | "in-stock" | "out-of-stock";
 }

@@ -12,8 +12,9 @@ import Link from "next/link";
 export default function LoginPage() {
   const router = useRouter();
   const { login, isAuthenticated } = useAuthStore();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  // Pre-fill demo credentials for development
+  const [email, setEmail] = useState("demo@marketplace.com");
+  const [password, setPassword] = useState("password123");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -145,13 +146,33 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="text-center text-sm">
-              <Link
-                href="/"
-                className="text-primary hover:underline"
-              >
-                Continue browsing without signing in
-              </Link>
+            <div className="space-y-3 text-center text-sm">
+              <p className="text-muted-foreground">
+                Don't have an account?{" "}
+                <Link
+                  href="/register"
+                  className="text-primary hover:underline font-medium"
+                >
+                  Create one
+                </Link>
+              </p>
+              <p className="text-muted-foreground">
+                Want to sell?{" "}
+                <Link
+                  href="/become-seller"
+                  className="text-primary hover:underline font-medium"
+                >
+                  Become a seller
+                </Link>
+              </p>
+              <div className="border-t pt-3">
+                <Link
+                  href="/"
+                  className="text-muted-foreground hover:text-primary"
+                >
+                  Continue browsing without signing in
+                </Link>
+              </div>
             </div>
           </div>
         </CardContent>
