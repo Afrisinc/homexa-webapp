@@ -245,11 +245,11 @@ export default function ChatPage({ params }: ChatPageProps) {
           setMessages((prev) => [...prev, newMessage]);
           setInputValue("");
         }
-      } else if (conversation) {
-        // For existing conversations, send via API using chat ID
-        console.log('Sending existing chat message:', { chatId: conversation.id, content: messageText });
+      } else {
+        // For existing chats, send via API using chat ID
+        console.log('Sending existing chat message:', { chatId: conversationId, content: messageText });
         const message = await chatsService.sendMessage(
-          conversation.id,
+          conversationId,
           messageText,
           undefined,
           true // isExistingChat = true for existing chats
@@ -264,23 +264,21 @@ export default function ChatPage({ params }: ChatPageProps) {
           setTimeout(() => refetchMessages(), 500);
         } else if (mountedRef.current && !message) {
           console.warn('API returned null, using fallback');
-          // Fallback to local state if API fails (legacy behavior)
+          // Fallback: create message locally if API fails
           const newMessage: Message = {
             id: `msg-${Date.now()}`,
-            conversationId: conversation.id,
             senderId: user?.id || "user-1",
             senderName: user?.name || "You",
-            senderType: "user",
             content: messageText,
             timestamp: new Date().toISOString(),
             isRead: false,
             productId: product.id,
+            attachments: [],
           };
 
           setMessages((prev) => [...prev, newMessage]);
           setInputValue("");
 
-          // Seller response will come via API polling, no need to simulate
           // Refetch messages after a delay to get seller's response
           setTimeout(() => refetchMessages(), 3000);
         }
