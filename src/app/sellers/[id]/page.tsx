@@ -15,11 +15,11 @@ import {
   Calendar,
   Briefcase,
   Award,
-  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { Seller, Product } from "@/lib/types";
 import { sellers } from "@/data/sellers";
+import { SellerDetailSkeleton } from "@/components/ui/skeleton";
 
 interface SellerDetailPageProps {
   params: Promise<{
@@ -63,14 +63,7 @@ export default function SellerDetailPage({ params }: SellerDetailPageProps) {
 
   // Loading state
   if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Loading seller profile...</p>
-        </div>
-      </div>
-    );
+    return <SellerDetailSkeleton />;
   }
 
   // Error state

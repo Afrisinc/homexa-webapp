@@ -26,7 +26,7 @@ export function ProductCard({ product, seller, className }: ProductCardProps) {
         <div className="relative aspect-square overflow-hidden bg-gray-100">
           <Image
             src={product.images[0]}
-            alt={product.title}
+            alt={product.name}
             fill
             className="object-cover transition-transform group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -44,7 +44,7 @@ export function ProductCard({ product, seller, className }: ProductCardProps) {
         {/* Product Name */}
         <Link href={`/products/${product.id}`}>
           <h3 className="mb-3 line-clamp-2 text-sm font-semibold transition-colors hover:text-primary">
-            {product.title}
+            {product.name}
           </h3>
         </Link>
 
@@ -62,7 +62,7 @@ export function ProductCard({ product, seller, className }: ProductCardProps) {
         {seller && (
           <div className="mb-3 flex items-center gap-2">
             <span className="truncate text-xs font-medium text-muted-foreground">
-              {seller.name}
+              {seller.firstName} {seller.lastName}
             </span>
             {seller.verified && (
               <div className="flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5">

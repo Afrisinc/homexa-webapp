@@ -33,6 +33,14 @@ class ApiClient {
   }
 
   /**
+   * Get authorization token from localStorage
+   */
+  private getAuthToken(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('auth_token');
+  }
+
+  /**
    * Build URL with query parameters
    */
   private buildUrl(endpoint: string, params?: Record<string, any>): string {
@@ -47,6 +55,29 @@ class ApiClient {
     }
 
     return url.toString();
+  }
+
+  /**
+   * Build headers with authorization token
+   */
+  private buildHeaders(customHeaders?: HeadersInit): HeadersInit {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Add custom headers if provided
+    if (customHeaders) {
+      if (typeof customHeaders === 'object' && !Array.isArray(customHeaders)) {
+        Object.assign(headers, customHeaders);
+      }
+    }
+
+    const token = this.getAuthToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return headers;
   }
 
   /**
@@ -83,10 +114,7 @@ class ApiClient {
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-      },
+      headers: this.buildHeaders(config?.headers),
       ...config,
     });
 
@@ -101,10 +129,7 @@ class ApiClient {
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-      },
+      headers: this.buildHeaders(config?.headers),
       body: data ? JSON.stringify(data) : undefined,
       ...config,
     });
@@ -120,10 +145,7 @@ class ApiClient {
 
     const response = await fetch(url, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-      },
+      headers: this.buildHeaders(config?.headers),
       body: data ? JSON.stringify(data) : undefined,
       ...config,
     });
@@ -139,10 +161,7 @@ class ApiClient {
 
     const response = await fetch(url, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-      },
+      headers: this.buildHeaders(config?.headers),
       body: data ? JSON.stringify(data) : undefined,
       ...config,
     });
@@ -158,10 +177,7 @@ class ApiClient {
 
     const response = await fetch(url, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-      },
+      headers: this.buildHeaders(config?.headers),
       ...config,
     });
 

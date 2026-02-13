@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Product } from "@/lib/types";
-import { categories } from "@/data/categories";
+import { Product, Category } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import {
   DropdownMenu,
@@ -19,14 +18,15 @@ import { ChevronDown } from "lucide-react";
 interface ProductFormProps {
   initialData?: Product;
   sellerId: string;
+  categories?: Category[];
   onSubmit: (data: Omit<Product, "id" | "createdAt" | "rating" | "reviewCount">) => void;
 }
 
-export function ProductForm({ initialData, sellerId, onSubmit }: ProductFormProps) {
+export function ProductForm({ initialData, sellerId, categories = [], onSubmit }: ProductFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: initialData?.title || "",
+    name: initialData?.name || "",
     description: initialData?.description || "",
     price: initialData?.price || 0,
     currency: initialData?.currency || "USD",
@@ -47,7 +47,7 @@ export function ProductForm({ initialData, sellerId, onSubmit }: ProductFormProp
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.title.trim()) newErrors.title = "Title is required";
+    if (!formData.name.trim()) newErrors.name = "Product name is required";
     if (!formData.description.trim())
       newErrors.description = "Description is required";
     if (formData.price <= 0) newErrors.price = "Price must be greater than 0";
@@ -110,18 +110,18 @@ export function ProductForm({ initialData, sellerId, onSubmit }: ProductFormProp
         <CardContent className="space-y-4">
           <div>
             <label className="mb-2 block text-sm font-medium">
-              Product Title *
+              Product Name *
             </label>
             <Input
-              value={formData.title}
+              value={formData.name}
               onChange={(e) =>
-                setFormData({ ...formData, title: e.target.value })
+                setFormData({ ...formData, name: e.target.value })
               }
               placeholder="e.g., Apple iPhone 15 Pro Max 256GB"
-              aria-label="Product title"
+              aria-label="Product name"
             />
-            {errors.title && (
-              <p className="mt-1 text-sm text-destructive">{errors.title}</p>
+            {errors.name && (
+              <p className="mt-1 text-sm text-destructive">{errors.name}</p>
             )}
           </div>
 

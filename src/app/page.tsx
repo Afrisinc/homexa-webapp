@@ -3,20 +3,41 @@
 import { useState, useMemo, useEffect } from "react";
 import { CategoryItem } from "@/components/marketplace/category-item";
 import { ProductCard } from "@/components/marketplace/product-card";
-import { categories } from "@/data/categories";
 import { sellers } from "@/data/sellers";
-import { ArrowRight, Loader2, Check, Search, Compass, MessageSquare, Handshake } from "lucide-react";
+import { ArrowRight, Check, Search, Compass, MessageSquare, Handshake } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { productsService } from "@/services/api";
-import { Product } from "@/lib/types";
+import { productsService, categoriesService } from "@/services/api";
+import { Product, Category } from "@/lib/types";
+import { ProductGridSkeleton } from "@/components/ui/skeleton";
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        const data = await categoriesService.getCategories();
+        setCategories(data);
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+        setCategories([]);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // Fetch products from API
   useEffect(() => {
@@ -24,8 +45,10 @@ export default function HomePage() {
       try {
         setLoading(true);
         setError(null);
-        const response = await productsService.getProducts();
-        setProducts(response.products);
+        const filters = selectedCategoryId ? { categoryId: selectedCategoryId } : undefined;
+        const response = await productsService.getProducts(filters);
+        console.log("Products ---->", response)
+        setProducts(response.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load products');
         console.error('Error fetching products:', err);
@@ -35,7 +58,7 @@ export default function HomePage() {
     };
 
     fetchProducts();
-  }, []);
+  }, [selectedCategoryId]);
 
   // Filter products based on search
   const filteredProducts = useMemo(() => {
@@ -44,7 +67,7 @@ export default function HomePage() {
     const query = searchQuery.toLowerCase();
     return products.filter(
       (product) =>
-        product.title.toLowerCase().includes(query) ||
+        product.name.toLowerCase().includes(query) ||
         product.description.toLowerCase().includes(query) ||
         product.brand.toLowerCase().includes(query)
     );
@@ -168,7 +191,11 @@ export default function HomePage() {
             {/* Category Filter */}
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-muted-foreground">Filter by:</span>
-              <select className="rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground">
+              <select
+                className="rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+                value={selectedCategoryId}
+                onChange={(e) => setSelectedCategoryId(e.target.value)}
+              >
                 <option value="">All Categories</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
@@ -209,12 +236,7 @@ export default function HomePage() {
           </div>
 
           {loading ? (
-            <div className="flex min-h-[300px] items-center justify-center">
-              <div className="flex flex-col items-center gap-4">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-sm text-muted-foreground">Loading products...</p>
-              </div>
-            </div>
+            <ProductGridSkeleton count={8} />
           ) : error ? (
             <div className="flex min-h-[300px] flex-col items-center justify-center rounded-lg border border-destructive/50 bg-destructive/10">
               <p className="mb-2 text-lg font-medium text-destructive">Error loading products</p>

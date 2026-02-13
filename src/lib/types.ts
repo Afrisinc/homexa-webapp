@@ -2,21 +2,48 @@
 
 export interface Product {
   id: string;
-  title: string;
-  description: string;
+  name: string;
+  slug: string;
   price: number;
-  currency: string;
-  images: string[];
-  rating: number;
-  reviewCount: number;
   categoryId: string;
+  sellerId: string;
+  seller?: Seller;
+  status: "active" | "inactive" | "archived";
+  description: string;
+  sku: string;
+  barcode: string;
+  compareAtPrice: number;
+  discountPercent: number;
+  currency: string;
+  vendorId: string;
   brand: string;
   model: string;
-  sellerId: string;
-  stock: number;
+  stockQuantity: number;
+  stock: number; // Alias for stockQuantity (used in UI)
+  allowBackorder: boolean;
+  warehouseLocation: string;
+  images: string[];
+  videos: string[];
+  weight: string;
+  length: string | null;
+  width: string | null;
+  height: string | null;
+  attributes: Record<string, any>;
+  visibility: boolean;
+  returnable: boolean;
+  isFeatured: boolean;
+  taxRate: number;
+  tags: string[];
+  metaTitle: string;
+  metaDescription: string;
+  seoKeywords: string[];
   createdAt: string;
-  condition?: "new" | "used" | "refurbished";
-  shipping?: {
+  updatedAt: string;
+  // Fields with defaults provided by API normalization
+  rating: number;
+  reviewCount: number;
+  condition: "new" | "used" | "refurbished";
+  shipping: {
     free: boolean;
     estimatedDays: number;
   };
@@ -25,23 +52,49 @@ export interface Product {
 export interface Category {
   id: string;
   name: string;
-  icon: string;
   slug: string;
+  status: "active" | "inactive";
+  icon?: string; // For backward compatibility with old format
+  image?: {
+    url: string;
+    alt_text: string;
+  };
+  seo?: {
+    meta_title: string;
+    meta_description: string;
+    keywords: string[];
+  };
+  metadata?: {
+    display_order: number;
+    is_featured: boolean;
+  };
+  description?: string;
+  parent_id?: string | null;
+  children?: Category[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Seller {
   id: string;
-  name: string;
-  avatar: string;
-  rating: number;
-  totalSales: number;
-  responseRate: number;
-  verified: boolean;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: "SELLER" | "BUYER" | "ADMIN";
+  phone: string;
+  avatar?: string;
+  rating?: number;
+  totalSales?: number;
+  responseRate?: number;
+  verified?: boolean;
   location?: string;
   createdAt?: string;
   description?: string;
   businessType?: "wholesaler" | "retailer" | "manufacturer";
   certifications?: string[];
+  // Computed property for display
+  name?: string;
+  companyName?: string;
 }
 
 export interface Message {
