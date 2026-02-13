@@ -6,10 +6,8 @@ import { PageHeader } from "@/components/dashboard/page-header";
 import {
   Package,
   DollarSign,
-  ShoppingCart,
   TrendingUp,
   AlertCircle,
-  Loader2,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
@@ -17,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { productsService } from "@/services/api";
 import { Product } from "@/lib/types";
+import { DashboardSkeleton } from "@/components/ui/skeleton";
 
 export default function SellerDashboardPage() {
   const { user } = useAuthStore();
@@ -39,7 +38,7 @@ export default function SellerDashboardPage() {
         setError(null);
         const response = await productsService.getProducts();
         // Filter products by sellerId on client (will be server-side when backend is ready)
-        const filtered = response.products.filter((p) => p.sellerId === user.sellerId);
+        const filtered = response.data.filter((p) => p.sellerId === user.sellerId);
         setSellerProducts(filtered);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load products');
@@ -54,13 +53,13 @@ export default function SellerDashboardPage() {
 
   // Calculate stats
   const totalProducts = sellerProducts.length;
-  const lowStockProducts = sellerProducts.filter((p) => p.stock < 10);
+  const lowStockProducts = sellerProducts.filter((p) => (p.stock ?? p.stockQuantity ?? 0) < 10);
   const totalRevenue = sellerProducts.reduce(
-    (sum, p) => sum + p.price * (100 - p.stock),
+    (sum, p) => sum + p.price * (100 - (p.stock ?? p.stockQuantity ?? 0)),
     0
   );
   const avgRating =
-    sellerProducts.reduce((sum, p) => sum + p.rating, 0) / totalProducts || 0;
+    sellerProducts.reduce((sum, p) => sum + (p.rating ?? 0), 0) / totalProducts || 0;
 
   const recentProducts = sellerProducts
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -68,14 +67,7 @@ export default function SellerDashboardPage() {
 
   // Loading state
   if (loading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Loading dashboard...</p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   // Error state
@@ -151,7 +143,7 @@ export default function SellerDashboardPage() {
                   className="flex items-center justify-between rounded-lg bg-white p-3 dark:bg-gray-900"
                 >
                   <div>
-                    <p className="font-medium">{product.title}</p>
+                    <p className="font-medium">{product.name}</p>
                     <p className="text-sm text-muted-foreground">
                       Only {product.stock} left in stock
                     </p>
@@ -189,14 +181,14 @@ export default function SellerDashboardPage() {
                   <div className="h-16 w-16 overflow-hidden rounded-lg border bg-gray-100">
                     <img
                       src={product.images[0]}
-                      alt={product.title}
+                      alt={product.name}
                       className="h-full w-full object-cover"
                     />
                   </div>
                   <div>
-                    <p className="font-medium">{product.title}</p>
+                    <p className="font-medium">{product.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      ${product.price.toFixed(2)} • Stock: {product.stock}
+                      ${product.price.toFixed(2)} • Stock: {product.stock ?? product.stockQuantity ?? 0}
                     </p>
                   </div>
                 </div>

@@ -5,13 +5,13 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { ProductCard } from "@/components/marketplace/product-card";
 import { FilterPanel } from "@/components/marketplace/filter-panel";
 import { SearchBar } from "@/components/marketplace/search-bar";
-import { FilterOptions, Product } from "@/lib/types";
+import { FilterOptions, Product, Category } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { SlidersHorizontal, Loader2 } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { productsService } from "@/services/api";
+import { productsService, categoriesService } from "@/services/api";
 import { sellers } from "@/data/sellers";
-import { categories } from "@/data/categories";
+import { ProductGridSkeleton } from "@/components/ui/skeleton";
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +22,9 @@ function ProductsContent() {
 
   // API state
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Initialize filters from URL params
@@ -40,6 +42,24 @@ function ProductsContent() {
       : undefined,
   }));
 
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        const data = await categoriesService.getCategories();
+        setCategories(data);
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+        setCategories([]);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   // Fetch products from API when filters change
   useEffect(() => {
     const fetchProducts = async () => {
@@ -47,7 +67,7 @@ function ProductsContent() {
         setLoading(true);
         setError(null);
         const response = await productsService.getProducts(filters);
-        setProducts(response.products);
+        setProducts(response.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load products');
         console.error('Error fetching products:', err);
@@ -123,7 +143,7 @@ function ProductsContent() {
           {/* Desktop Filters */}
           <aside className="hidden w-64 shrink-0 lg:block">
             <div className="sticky top-4">
-              <FilterPanel filters={filters} onFilterChange={setFilters} />
+              <FilterPanel filters={filters} onFilterChange={setFilters} categories={categories} />
             </div>
           </aside>
 
@@ -143,6 +163,7 @@ function ProductsContent() {
                     filters={filters}
                     onFilterChange={handleFilterChange}
                     className="border-0 shadow-none"
+                    categories={categories}
                   />
                 </SheetContent>
               </Sheet>
@@ -150,10 +171,7 @@ function ProductsContent() {
 
             {/* Loading State */}
             {loading ? (
-              <div className="flex min-h-[400px] flex-col items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="mt-4 text-sm text-muted-foreground">Loading products...</p>
-              </div>
+              <ProductGridSkeleton count={6} />
             ) : error ? (
               <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-destructive/50 bg-destructive/10">
                 <p className="mb-2 text-lg font-medium text-destructive">Error loading products</p>

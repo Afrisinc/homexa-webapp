@@ -12,21 +12,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, X, Check } from "lucide-react";
-import { FilterOptions } from "@/lib/types";
+import { FilterOptions, Category } from "@/lib/types";
 import { getBrands, getModelsByBrand, getPriceRangeByCurrency, getCurrencies } from "@/data/products";
 import { formatCurrency } from "@/utils/constants";
-import { categories } from "@/data/categories";
 
 interface FilterPanelProps {
   filters: FilterOptions;
   onFilterChange: (filters: FilterOptions) => void;
   className?: string;
+  categories?: Category[];
 }
 
 export function FilterPanel({
   filters,
   onFilterChange,
   className,
+  categories = [],
 }: FilterPanelProps) {
   const [selectedCurrency, setSelectedCurrency] = useState<string | undefined>(
     filters.currency
@@ -61,6 +62,9 @@ export function FilterPanel({
   const brands = getBrands();
   const models = selectedBrand ? getModelsByBrand(selectedBrand) : [];
   const currencies = getCurrencies();
+  const activeCategoryName = selectedCategory
+    ? categories.find((c) => c.id === selectedCategory)?.name
+    : undefined;
 
   // Update price range when currency changes or filters change
   useEffect(() => {
@@ -311,52 +315,52 @@ export function FilterPanel({
         )}
 
         {/* Category */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium">Category</label>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-between"
-                aria-label="Select category"
-              >
-                <span className="truncate">
-                  {selectedCategory
-                    ? categories.find((c) => c.id === selectedCategory)?.name
-                    : "All Categories"}
-                </span>
-                <ChevronDown className="ml-2 h-4 w-4 shrink-0" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="start">
-              <DropdownMenuItem
-                onSelect={() => {
-                  setSelectedCategory(undefined);
-                  onFilterChange({
-                    ...filters,
-                    categoryId: undefined,
-                  });
-                }}
-              >
-                All Categories
-              </DropdownMenuItem>
-              {categories.map((category) => (
+        {categories.length > 0 && (
+          <div className="space-y-3">
+            <label className="text-sm font-medium">Category</label>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-between"
+                  aria-label="Select category"
+                >
+                  <span className="truncate">
+                    {activeCategoryName || "All Categories"}
+                  </span>
+                  <ChevronDown className="ml-2 h-4 w-4 shrink-0" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="start">
                 <DropdownMenuItem
-                  key={category.id}
                   onSelect={() => {
-                    setSelectedCategory(category.id);
+                    setSelectedCategory(undefined);
                     onFilterChange({
                       ...filters,
-                      categoryId: category.id,
+                      categoryId: undefined,
                     });
                   }}
                 >
-                  {category.name}
+                  All Categories
                 </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+                {categories.map((category) => (
+                  <DropdownMenuItem
+                    key={category.id}
+                    onSelect={() => {
+                      setSelectedCategory(category.id);
+                      onFilterChange({
+                        ...filters,
+                        categoryId: category.id,
+                      });
+                    }}
+                  >
+                    {category.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
 
         {/* Location */}
         <div className="space-y-3">

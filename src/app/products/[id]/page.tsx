@@ -12,7 +12,6 @@ import {
   ArrowLeft,
   Check,
   Store,
-  Loader2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,6 +21,7 @@ import { productsService } from "@/services/api";
 import { Product } from "@/lib/types";
 import { sellers } from "@/data/sellers";
 import { conversations } from "@/data/conversations";
+import { ProductDetailSkeleton } from "@/components/ui/skeleton";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -47,6 +47,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
         setLoading(true);
         setError(null);
         const data = await productsService.getProductById(id);
+        console.log("daba ------->", data)
         setProduct(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load product');
@@ -59,16 +60,22 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     fetchProduct();
   }, [id]);
 
-  // Get seller info (temporary - will use API later)
-  const seller = product ? sellers.find((s) => s.id === product.sellerId) : null;
+  // Get seller info from API response or fallback to static data
+  const seller = product
+    ? product.seller || sellers.find((s) => s.id === product.sellerId)
+    : null;
 
   // Loading state
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Loading product...</p>
+      <div className="min-h-screen">
+        <div className="border-b">
+          <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+            <div className="h-8 w-24 bg-muted animate-pulse rounded" />
+          </div>
+        </div>
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <ProductDetailSkeleton />
         </div>
       </div>
     );
@@ -90,14 +97,14 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     );
   }
 
-  // No seller found
-  if (!seller) {
-    notFound();
-  }
-
   const handleChatClick = () => {
     if (!isAuthenticated) {
       router.push("/login");
+      return;
+    }
+
+    if (!seller) {
+      alert("Seller information not available. Please try again later.");
       return;
     }
 
@@ -137,7 +144,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
             <div className="relative aspect-square overflow-hidden rounded-lg border bg-gray-100">
               <Image
                 src={product.images[selectedImage]}
-                alt={product.title}
+                alt={product.name}
                 fill
                 className="object-cover"
                 priority
@@ -160,7 +167,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                   >
                     <Image
                       src={image}
-                      alt={`${product.title} ${index + 1}`}
+                      alt={`${product.name} ${index + 1}`}
                       fill
                       className="object-cover"
                       sizes="(max-width: 1024px) 25vw, 12.5vw"
@@ -174,7 +181,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
           {/* Product Info Section */}
           <div className="space-y-6">
             <div>
-              <h1 className="mb-2 text-3xl font-bold">{product.title}</h1>
+              <h1 className="mb-2 text-3xl font-bold">{product.name}</h1>
               <div className="flex items-center gap-4">
                 <RatingStars
                   rating={product.rating}
@@ -204,7 +211,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
               <div className="mb-4">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold">Seller Information</h3>
-                  {seller.verified && (
+                  {seller?.verified && (
                     <div className="flex items-center gap-1 rounded-full bg-green-100 px-2 py-1">
                       <Check className="h-3.5 w-3.5 text-green-600" />
                       <span className="text-xs font-semibold text-green-700">Verified</span>
@@ -212,39 +219,67 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                   )}
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <Avatar className="h-14 w-14">
-                  <AvatarImage src={seller.avatar} alt={seller.name} />
-                  <AvatarFallback>{seller.name[0]}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 space-y-2">
-                  <Link href={`/sellers/${seller.id}`}>
-                    <p className="font-semibold hover:text-primary transition-colors">
-                      {seller.name}
-                    </p>
-                  </Link>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm">
-                      <RatingStars rating={seller.rating} size="sm" />
-                      <span className="font-medium">{seller.rating}/5</span>
-                      <span className="text-muted-foreground">({seller.totalSales.toLocaleString()} sales)</span>
+              {seller ? (
+                <>
+                  <div className="flex items-start gap-3">
+                    <Avatar className="h-14 w-14">
+                      <AvatarImage src={seller.avatar} alt={seller.name || `${seller.firstName} ${seller.lastName}`} />
+                      <AvatarFallback>{(seller.name || seller.firstName)?.[0] || '?'}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 space-y-2">
+                      <Link href={`/sellers/${seller.id}`}>
+                        <p className="font-semibold hover:text-primary transition-colors">
+                          {seller.name || `${seller.firstName} ${seller.lastName}`}
+                        </p>
+                      </Link>
+                      <div className="space-y-1">
+                        {seller.rating !== undefined && seller.rating > 0 ? (
+                          <>
+                            <div className="flex items-center gap-2 text-sm">
+                              <RatingStars rating={seller.rating} size="sm" />
+                              <span className="font-medium">{seller.rating}/5</span>
+                              {seller.totalSales !== undefined && (
+                                <span className="text-muted-foreground">({seller.totalSales.toLocaleString()} sales)</span>
+                              )}
+                            </div>
+                            {seller.responseRate !== undefined && seller.responseRate > 0 && (
+                              <p className="text-sm text-muted-foreground">
+                                {seller.responseRate}% response rate
+                              </p>
+                            )}
+                          </>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">
+                            {seller.phone || 'Verified seller'}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {seller.responseRate}% response rate
-                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="mt-4 w-full"
+                  >
+                    <Link href={`/sellers/${seller.id}`}>
+                      View Seller Profile
+                    </Link>
+                  </Button>
+                </>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <p className="text-sm text-muted-foreground">
+                    Seller ID: {product.sellerId}
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-full bg-green-100 dark:bg-green-900 p-2">
+                      <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <span className="text-sm">Verified seller on marketplace</span>
                   </div>
                 </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                className="mt-4 w-full"
-              >
-                <Link href={`/sellers/${seller.id}`}>
-                  View Seller Profile
-                </Link>
-              </Button>
+              )}
             </Card>
 
             {/* Trust Signals & Logistics */}
@@ -283,6 +318,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
               size="lg"
               className="w-full gap-2 text-lg"
               onClick={handleChatClick}
+              disabled={!isAuthenticated}
             >
               <MessageCircle className="h-5 w-5" />
               Start Chat About This Product

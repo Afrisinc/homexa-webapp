@@ -186,14 +186,14 @@ export default function ChatPage({ params }: ChatPageProps) {
           <div className="relative h-12 w-12 overflow-hidden rounded-lg border bg-white">
             <Image
               src={product.images[0]}
-              alt={product.title}
+              alt={product.name}
               fill
               className="object-cover"
               sizes="48px"
             />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="truncate text-sm font-medium">{product.title}</p>
+            <p className="truncate text-sm font-medium">{product.name}</p>
             <p className="text-sm font-semibold text-primary">
               ${product.price.toFixed(2)}
             </p>

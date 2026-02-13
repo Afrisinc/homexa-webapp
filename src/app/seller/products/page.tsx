@@ -36,7 +36,7 @@ export default function SellerProductsPage() {
 
   // Apply search filter
   const filteredProducts = sellerProducts.filter((product) =>
-    product.title.toLowerCase().includes(searchQuery.toLowerCase())
+    product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleDeleteClick = (productId: string) => {
@@ -108,7 +108,7 @@ export default function SellerProductsPage() {
                   <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg border bg-gray-100">
                     <img
                       src={product.images[0]}
-                      alt={product.title}
+                      alt={product.name}
                       className="h-full w-full object-cover"
                     />
                   </div>
@@ -116,7 +116,7 @@ export default function SellerProductsPage() {
                   {/* Product Info */}
                   <div className="flex-1">
                     <h3 className="mb-1 text-lg font-semibold">
-                      {product.title}
+                      {product.name}
                     </h3>
                     <p className="mb-2 line-clamp-2 text-sm text-muted-foreground">
                       {product.description}
@@ -132,12 +132,12 @@ export default function SellerProductsPage() {
                         <span className="font-medium">Stock:</span>{" "}
                         <span
                           className={
-                            product.stock < 10
+                            (product.stock ?? product.stockQuantity ?? 0) < 10
                               ? "text-yellow-600"
                               : "text-green-600"
                           }
                         >
-                          {product.stock} units
+                          {product.stock ?? product.stockQuantity ?? 0} units
                         </span>
                       </div>
                       <div>
@@ -146,7 +146,7 @@ export default function SellerProductsPage() {
                       </div>
                       <div>
                         <span className="font-medium">Rating:</span>{" "}
-                        {product.rating.toFixed(1)} ({product.reviewCount}{" "}
+                        {(product.rating ?? 0).toFixed(1)} ({product.reviewCount ?? 0}{" "}
                         reviews)
                       </div>
                     </div>
