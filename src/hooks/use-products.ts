@@ -20,8 +20,8 @@ export function useProducts(filters?: FilterOptions) {
   }, [execute, JSON.stringify(filters)]);
 
   return {
-    products: data?.products || [],
-    total: data?.total || 0,
+    products: data?.data || [],
+    total: data?.data?.length || 0,
     loading,
     error,
     refetch: () => execute(filters),
@@ -81,7 +81,7 @@ export function useProductSearch(initialQuery: string = '') {
   }, [query, execute]);
 
   return {
-    products: data?.products || [],
+    products: data?.data || [],
     total: data?.total || 0,
     loading,
     error,

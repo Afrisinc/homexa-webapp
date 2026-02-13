@@ -3,13 +3,12 @@
 import { useState, useMemo, useEffect } from "react";
 import { CategoryItem } from "@/components/marketplace/category-item";
 import { ProductCard } from "@/components/marketplace/product-card";
-import { sellers } from "@/data/sellers";
 import { ArrowRight, Check, Search, Compass, MessageSquare, Handshake } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { productsService, categoriesService } from "@/services/api";
-import { Product, Category } from "@/lib/types";
+import { productsService, categoriesService, sellersService } from "@/services/api";
+import { Product, Category, type Seller } from "@/lib/types";
 import { ProductGridSkeleton } from "@/components/ui/skeleton";
 
 export default function HomePage() {
@@ -17,8 +16,10 @@ export default function HomePage() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [sellers, setSellers] = useState<Seller[]>([]);
   const [loading, setLoading] = useState(true);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [sellersLoading, setSellersLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch categories from API
@@ -37,6 +38,24 @@ export default function HomePage() {
     };
 
     fetchCategories();
+  }, []);
+
+  // Fetch sellers from API
+  useEffect(() => {
+    const fetchSellers = async () => {
+      try {
+        setSellersLoading(true);
+        const response = await sellersService.getSellers(1, 4);
+        setSellers(response.data || []);
+      } catch (err) {
+        console.error('Error fetching sellers:', err);
+        setSellers([]);
+      } finally {
+        setSellersLoading(false);
+      }
+    };
+
+    fetchSellers();
   }, []);
 
   // Fetch products from API

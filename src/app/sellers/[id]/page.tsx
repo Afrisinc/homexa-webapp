@@ -18,8 +18,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Seller, Product } from "@/lib/types";
-import { sellers } from "@/data/sellers";
 import { SellerDetailSkeleton } from "@/components/ui/skeleton";
+import { sellersService, productsService } from "@/services/api";
 
 interface SellerDetailPageProps {
   params: Promise<{
@@ -43,13 +43,20 @@ export default function SellerDetailPage({ params }: SellerDetailPageProps) {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`/api/sellers/${id}`);
-        if (!response.ok) {
+        const sellerData = await sellersService.getSellerById(id);
+        if (!sellerData) {
           throw new Error("Failed to load seller");
         }
-        const data = await response.json();
-        setSeller(data.seller);
-        setProducts(data.products);
+        setSeller(sellerData);
+
+        // Fetch products for this seller
+        try {
+          const productsResponse = await productsService.getProductsBySeller(id);
+          setProducts(productsResponse.data || []);
+        } catch (err) {
+          console.error("Error fetching seller products:", err);
+          setProducts([]);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load seller");
         console.error("Error fetching seller:", err);
@@ -116,8 +123,8 @@ export default function SellerDetailPage({ params }: SellerDetailPageProps) {
             {/* Avatar */}
             <div>
               <Avatar className="h-32 w-32">
-                <AvatarImage src={seller.avatar} alt={seller.name} />
-                <AvatarFallback className="text-2xl">{seller.name[0]}</AvatarFallback>
+                <AvatarImage src={seller.avatar || ""} alt={seller.name || "Seller"} />
+                <AvatarFallback className="text-2xl">{seller.name?.[0] || "S"}</AvatarFallback>
               </Avatar>
             </div>
 
@@ -144,13 +151,13 @@ export default function SellerDetailPage({ params }: SellerDetailPageProps) {
                 <div className="rounded-lg border bg-card p-3">
                   <p className="text-xs text-muted-foreground">Rating</p>
                   <div className="mt-1 flex items-center gap-2">
-                    <RatingStars rating={seller.rating} size="sm" />
-                    <span className="font-medium">{seller.rating}/5</span>
+                    <RatingStars rating={seller.rating || 0} size="sm" />
+                    <span className="font-medium">{(seller.rating || 0).toFixed(1)}/5</span>
                   </div>
                 </div>
                 <div className="rounded-lg border bg-card p-3">
                   <p className="text-xs text-muted-foreground">Total Sales</p>
-                  <p className="mt-1 font-medium">{seller.totalSales.toLocaleString()}</p>
+                  <p className="mt-1 font-medium">{(seller.totalSales || 0).toLocaleString()}</p>
                 </div>
                 <div className="rounded-lg border bg-card p-3">
                   <p className="text-xs text-muted-foreground">Response Rate</p>

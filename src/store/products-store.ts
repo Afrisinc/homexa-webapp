@@ -3,7 +3,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Product } from "@/lib/types";
-import { products as initialProducts } from "@/data/products";
 
 interface ProductsState {
   products: Product[];
@@ -17,7 +16,7 @@ interface ProductsState {
 export const useProductsStore = create<ProductsState>()(
   persist(
     (set, get) => ({
-      products: initialProducts,
+      products: [],
 
       addProduct: (productData) => {
         const newProduct: Product = {

@@ -2,17 +2,15 @@
 
 import { useState } from "react";
 import { useAuthStore } from "@/store/auth-store";
-import { sellers } from "@/data/sellers";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, User, Store, Mail, Shield } from "lucide-react";
+import { Loader2, User, Store, Mail } from "lucide-react";
 
 export default function SellerSettingsPage() {
   const { user, setUser } = useAuthStore();
-  const sellerProfile = sellers.find((s) => s.id === user?.sellerId);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -21,7 +19,7 @@ export default function SellerSettingsPage() {
     name: user?.name || "",
     email: user?.email || "",
     avatar: user?.avatar || "",
-    storeName: sellerProfile?.name || "",
+    storeName: user?.name || "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -144,54 +142,6 @@ export default function SellerSettingsPage() {
                 This is the name that customers will see
               </p>
             </div>
-
-            {sellerProfile && (
-              <>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block text-sm font-medium">
-                      Total Sales
-                    </label>
-                    <div className="rounded-lg border bg-secondary/50 p-3">
-                      <p className="text-2xl font-bold">
-                        {sellerProfile.totalSales.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-sm font-medium">
-                      Store Rating
-                    </label>
-                    <div className="rounded-lg border bg-secondary/50 p-3">
-                      <p className="text-2xl font-bold">
-                        {sellerProfile.rating.toFixed(1)} / 5.0
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium">
-                    Response Rate
-                  </label>
-                  <div className="rounded-lg border bg-secondary/50 p-3">
-                    <p className="text-2xl font-bold">
-                      {sellerProfile.responseRate}%
-                    </p>
-                  </div>
-                </div>
-
-                {sellerProfile.verified && (
-                  <div className="flex items-center gap-2 rounded-lg border border-green-500/50 bg-green-50 p-3 dark:bg-green-950/20">
-                    <Shield className="h-5 w-5 text-green-600" />
-                    <span className="font-medium text-green-800 dark:text-green-200">
-                      Verified Seller
-                    </span>
-                  </div>
-                )}
-              </>
-            )}
           </CardContent>
         </Card>
 
@@ -218,7 +168,7 @@ export default function SellerSettingsPage() {
                 name: user?.name || "",
                 email: user?.email || "",
                 avatar: user?.avatar || "",
-                storeName: sellerProfile?.name || "",
+                storeName: user?.name || "",
               });
             }}
           >

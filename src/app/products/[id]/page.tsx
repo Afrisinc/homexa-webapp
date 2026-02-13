@@ -19,7 +19,6 @@ import { useState, use, useEffect } from "react";
 import { useAuthStore } from "@/store/auth-store";
 import { productsService, chatsService } from "@/services/api";
 import { Product } from "@/lib/types";
-import { sellers } from "@/data/sellers";
 import { ProductDetailSkeleton } from "@/components/ui/skeleton";
 
 interface ProductDetailPageProps {
@@ -59,10 +58,8 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     fetchProduct();
   }, [id]);
 
-  // Get seller info from API response or fallback to static data
-  const seller = product
-    ? product.seller || sellers.find((s) => s.id === product.sellerId)
-    : null;
+  // Get seller info from API response
+  const seller = product?.seller || null;
 
   // Loading state
   if (loading) {

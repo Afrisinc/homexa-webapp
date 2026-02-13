@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronDown, X, Check } from "lucide-react";
 import { FilterOptions, Category } from "@/lib/types";
-import { getBrands, getModelsByBrand, getPriceRangeByCurrency, getCurrencies } from "@/data/products";
 import { formatCurrency } from "@/utils/constants";
 
 interface FilterPanelProps {
@@ -49,19 +48,21 @@ export function FilterPanel({
     filters.availability ?? "all"
   );
 
-  // Get dynamic price range based on selected currency
+  // Default price range and currencies
+  const DEFAULT_PRICE_CONFIG = { min: 0, max: 10000, step: 100 };
+
   const priceConfig = useMemo(() => {
-    return getPriceRangeByCurrency(selectedCurrency);
-  }, [selectedCurrency]);
+    return DEFAULT_PRICE_CONFIG;
+  }, []);
 
   const [priceRange, setPriceRange] = useState<[number, number]>([
     filters.priceMin ?? priceConfig.min,
     filters.priceMax ?? priceConfig.max,
   ]);
 
-  const brands = getBrands();
-  const models = selectedBrand ? getModelsByBrand(selectedBrand) : [];
-  const currencies = getCurrencies();
+  const brands: string[] = [];
+  const models: string[] = [];
+  const currencies = ["USD", "RWF"];
   const activeCategoryName = selectedCategory
     ? categories.find((c) => c.id === selectedCategory)?.name
     : undefined;
@@ -94,7 +95,7 @@ export function FilterPanel({
 
   const handleCurrencyChange = (currency: string) => {
     setSelectedCurrency(currency);
-    const newPriceConfig = getPriceRangeByCurrency(currency);
+    const newPriceConfig = DEFAULT_PRICE_CONFIG;
     setPriceRange([newPriceConfig.min, newPriceConfig.max]);
     onFilterChange({
       ...filters,
@@ -123,7 +124,7 @@ export function FilterPanel({
   };
 
   const handleClearFilters = () => {
-    const defaultConfig = getPriceRangeByCurrency();
+    const defaultConfig = DEFAULT_PRICE_CONFIG;
     setPriceRange([defaultConfig.min, defaultConfig.max]);
     setSelectedCurrency(undefined);
     setSelectedBrand(undefined);
@@ -184,7 +185,7 @@ export function FilterPanel({
                 <DropdownMenuItem
                   onSelect={() => {
                     setSelectedCurrency(undefined);
-                    const defaultConfig = getPriceRangeByCurrency();
+                    const defaultConfig = DEFAULT_PRICE_CONFIG;
                     setPriceRange([defaultConfig.min, defaultConfig.max]);
                     onFilterChange({
                       ...filters,

@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { productsService, categoriesService } from "@/services/api";
-import { sellers } from "@/data/sellers";
 import { ProductGridSkeleton } from "@/components/ui/skeleton";
 
 export const dynamic = 'force-dynamic';
@@ -96,10 +95,10 @@ function ProductsContent() {
     router.replace(newUrl, { scroll: false });
   }, [filters, router]);
 
-  // Map products with sellers
+  // Map products - seller info comes from API response
   const productsWithSellers = products.map((product) => ({
     product,
-    seller: sellers.find((s) => s.id === product.sellerId),
+    seller: product.seller,
   }));
 
   const handleFilterChange = (newFilters: FilterOptions) => {
