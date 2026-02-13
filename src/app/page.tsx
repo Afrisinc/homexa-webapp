@@ -288,7 +288,7 @@ export default function HomePage() {
                   {/* Seller Logo/Avatar */}
                   <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-purple-600/20">
                     <div className="text-2xl font-bold text-primary">
-                      {seller.name.charAt(0)}
+                      {seller.name?.[0] || "S"}
                     </div>
                   </div>
 
