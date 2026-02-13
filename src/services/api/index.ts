@@ -14,6 +14,7 @@ export * from './orders.service';
 export * from './reviews.service';
 export * from './categories.service';
 export * from './conversations.service';
+export * from './chats.service';
 export * from './sellers.service';
 export * from './analytics.service';
 export * from './users.service';

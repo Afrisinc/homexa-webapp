@@ -13,8 +13,8 @@ export default function LoginPage() {
   const router = useRouter();
   const { login, isAuthenticated } = useAuthStore();
   // Pre-fill demo credentials for development
-  const [email, setEmail] = useState("demo@marketplace.com");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("admin@afrisinc.com");
+  const [password, setPassword] = useState("password@123");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 

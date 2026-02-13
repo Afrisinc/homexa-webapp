@@ -17,10 +17,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, use, useEffect } from "react";
 import { useAuthStore } from "@/store/auth-store";
-import { productsService } from "@/services/api";
+import { productsService, chatsService } from "@/services/api";
 import { Product } from "@/lib/types";
 import { sellers } from "@/data/sellers";
-import { conversations } from "@/data/conversations";
 import { ProductDetailSkeleton } from "@/components/ui/skeleton";
 
 interface ProductDetailPageProps {
@@ -97,7 +96,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     );
   }
 
-  const handleChatClick = () => {
+  const handleChatClick = async () => {
     if (!isAuthenticated) {
       router.push("/login");
       return;
@@ -108,16 +107,15 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
       return;
     }
 
-    // Find existing conversation or create new one
-    const existingConversation = conversations.find(
-      (c) => c.productId === product.id
-    );
+    // Fetch existing chats to find one for this product
+    const chats = await chatsService.getChats();
+    const existingChat = chats.find((c) => c.productId === product.id);
 
-    if (existingConversation) {
-      router.push(`/chat/${existingConversation.id}`);
+    if (existingChat) {
+      router.push(`/chat/${existingChat.id}`);
     } else {
-      // In a real app, this would create a new conversation
-      router.push(`/chat/new?productId=${product.id}`);
+      // Start new chat with product and seller info
+      router.push(`/chat/new?productId=${product.id}&sellerId=${seller.id}`);
     }
   };
 

@@ -118,12 +118,15 @@ export const authService = {
    * Get current authenticated user
    */
   async getCurrentUser(): Promise<User> {
-    const response = await apiClient.get<any>('/api/auth/me');
+    const response = await apiClient.get<any>('/users/profile');
 
     const data = response.data || response;
 
-    if (data.user) {
-      return normalizeUser(data.user);
+    // Handle nested data format: { success, resp_msg, resp_code, data: { id, email, ... } }
+    const user = data.data || data.user || data;
+
+    if (user && user.id) {
+      return normalizeUser(user);
     }
 
     throw new Error('Failed to fetch current user');

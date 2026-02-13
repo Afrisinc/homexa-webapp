@@ -296,3 +296,60 @@ export function DashboardSkeleton() {
     </div>
   );
 }
+
+// Chat Message Skeleton
+export function ChatMessageSkeleton() {
+  return (
+    <div className="flex justify-start">
+      <div className="max-w-[80%] space-y-1 rounded-2xl bg-secondary px-4 py-2">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-3 w-12" />
+      </div>
+    </div>
+  );
+}
+
+// Chat Skeleton
+export function ChatSkeleton({ messageCount = 5 }: { messageCount?: number }) {
+  return (
+    <div className="flex flex-col h-screen">
+      {/* Header Skeleton */}
+      <div className="flex items-center gap-4 border-b bg-card px-4 py-3">
+        <Skeleton className="h-10 w-10 rounded-full" />
+        <div className="flex-1">
+          <Skeleton className="h-5 w-32 mb-2" />
+          <Skeleton className="h-3 w-48" />
+        </div>
+        <Skeleton className="h-9 w-9 rounded-md" />
+      </div>
+
+      {/* Product Info Skeleton */}
+      <div className="border-b bg-secondary/30 px-4 py-3">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-12 w-12 rounded-lg" />
+          <div className="flex-1">
+            <Skeleton className="h-4 w-32 mb-2" />
+            <Skeleton className="h-4 w-24" />
+          </div>
+        </div>
+      </div>
+
+      {/* Messages Skeleton */}
+      <div className="flex-1 overflow-y-auto bg-secondary/10 px-4 py-6">
+        <div className="mx-auto max-w-4xl space-y-4">
+          {Array.from({ length: messageCount }).map((_, i) => (
+            <ChatMessageSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+
+      {/* Input Skeleton */}
+      <div className="border-t bg-card px-4 py-4">
+        <div className="flex gap-2">
+          <Skeleton className="h-10 flex-1 rounded-md" />
+          <Skeleton className="h-10 w-10 rounded-md" />
+        </div>
+      </div>
+    </div>
+  );
+}

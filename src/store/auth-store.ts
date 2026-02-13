@@ -9,6 +9,7 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+  isInitialized: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   setUser: (user: User | null) => void;
@@ -22,6 +23,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
+      isInitialized: false,
 
       login: async (email: string, password: string) => {
         try {
@@ -81,23 +83,37 @@ export const useAuthStore = create<AuthState>()(
         // Try to restore token from localStorage
         const savedToken = localStorage.getItem('auth_token');
 
-        if (savedToken) {
-          try {
-            const user = await authService.getCurrentUser();
+        try {
+          if (savedToken) {
+            try {
+              const user = await authService.getCurrentUser();
+              set({
+                user,
+                token: savedToken,
+                isAuthenticated: true,
+                isInitialized: true,
+              });
+            } catch (error) {
+              console.error('Failed to restore session:', error);
+              localStorage.removeItem('auth_token');
+              set({
+                user: null,
+                token: null,
+                isAuthenticated: false,
+                isInitialized: true,
+              });
+            }
+          } else {
+            // No saved token, just mark as initialized
             set({
-              user,
-              token: savedToken,
-              isAuthenticated: true,
-            });
-          } catch (error) {
-            console.error('Failed to restore session:', error);
-            localStorage.removeItem('auth_token');
-            set({
-              user: null,
-              token: null,
-              isAuthenticated: false,
+              isInitialized: true,
             });
           }
+        } catch (error) {
+          console.error('Auth initialization error:', error);
+          set({
+            isInitialized: true,
+          });
         }
       },
     }),

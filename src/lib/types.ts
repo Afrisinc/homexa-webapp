@@ -99,12 +99,32 @@ export interface Seller {
 
 export interface Message {
   id: string;
-  conversationId: string;
   senderId: string;
-  senderType: "user" | "seller";
+  senderName: string;
   content: string;
   timestamp: string;
-  read: boolean;
+  isRead: boolean;
+  productId: string;
+  attachments?: string[];
+}
+
+export interface Chat {
+  id: string;
+  participantId: string;
+  participantName: string;
+  participantRole: string;
+  participantAvatar?: string;
+  lastMessage: string;
+  lastMessageTime: string;
+  unreadCount: number;
+  productId: string;
+  productName: string;
+  productImage: string;
+  productPrice: number;
+  productSlug: string;
+  messages: Message[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Conversation {

@@ -3,12 +3,22 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
 interface ChatBubbleProps {
-  message: Message;
+  message: Message & { senderType?: "user" | "seller" };
   className?: string;
+  userId?: string;
 }
 
-export function ChatBubble({ message, className }: ChatBubbleProps) {
-  const isUser = message.senderType === "user";
+export function ChatBubble({ message, className, userId }: ChatBubbleProps) {
+  // Determine if message is from user based on senderType (legacy) or userId comparison
+  const isUser = message.senderType === "user" || (userId && message.senderId === userId);
+
+  // Format timestamp safely
+  const formatTime = () => {
+    if (!message.timestamp) return "";
+    const date = new Date(message.timestamp);
+    if (Number.isNaN(date.getTime())) return "";
+    return format(date, "HH:mm");
+  };
 
   return (
     <div
@@ -33,7 +43,7 @@ export function ChatBubble({ message, className }: ChatBubbleProps) {
             isUser ? "text-primary-foreground/70" : "text-muted-foreground"
           )}
         >
-          {format(new Date(message.timestamp), "HH:mm")}
+          {formatTime()}
         </p>
       </div>
     </div>
