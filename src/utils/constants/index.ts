@@ -7,9 +7,9 @@ type NavLink = {
 
 export const NAV_LINKS = [
   { href: "/products", title: "Products" },
-  { href: "/blog", title: "Blog" },
-  { href: "/about", title: "About" },
-  { href: "/contact", title: "Contact" },
+  // { href: "/blog", title: "Blog" },
+  // { href: "/about", title: "About" },
+  // { href: "/contact", title: "Contact" },
 ] satisfies NavLink[];
 
 // Currency formatting utility

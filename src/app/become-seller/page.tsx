@@ -11,7 +11,7 @@ import Link from "next/link";
 
 export default function BecomeSellerPage() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, isInitialized } = useAuthStore();
   const [step, setStep] = useState<1 | 2>(1);
   const [businessName, setBusinessName] = useState("");
   const [businessType, setBusinessType] = useState<"retailer" | "wholesaler" | "manufacturer">("retailer");
@@ -19,6 +19,15 @@ export default function BecomeSellerPage() {
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Wait for initialization
+  if (!isInitialized) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-primary/5 to-transparent px-4">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
 
   // Redirect if not authenticated
   if (!isAuthenticated || !user) {

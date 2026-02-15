@@ -48,9 +48,11 @@ export default function SellerLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, isInitialized } = useAuthStore();
 
   useEffect(() => {
+    if (!isInitialized) return;
+
     if (!isAuthenticated) {
       router.push("/login");
       return;
@@ -59,9 +61,9 @@ export default function SellerLayout({
     if (user?.role !== "seller") {
       router.push("/");
     }
-  }, [isAuthenticated, user, router]);
+  }, [isAuthenticated, isInitialized, user, router]);
 
-  if (!isAuthenticated || user?.role !== "seller") {
+  if (!isInitialized || !isAuthenticated || user?.role !== "seller") {
     return null;
   }
 

@@ -45,7 +45,7 @@ export default function HomePage() {
     const fetchSellers = async () => {
       try {
         setSellersLoading(true);
-        const response = await sellersService.getSellers(1, 4);
+        const response = await sellersService.getSellers(1, 5);
         setSellers(response.data || []);
       } catch (err) {
         console.error('Error fetching sellers:', err);
@@ -295,11 +295,20 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {sellers
-              .filter((seller) => seller.verified)
-              .slice(0, 4)
-              .map((seller) => (
+          {sellersLoading ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="rounded-lg border bg-card p-6 animate-pulse">
+                  <div className="mb-4 h-16 w-16 rounded-full bg-muted" />
+                  <div className="mb-2 h-4 w-24 rounded bg-muted" />
+                  <div className="mb-4 h-8 w-full rounded bg-muted" />
+                  <div className="h-9 w-full rounded bg-muted" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+              {sellers.slice(0, 5).map((seller) => (
                 <div
                   key={seller.id}
                   className="group rounded-lg border bg-card p-6 transition-all hover:shadow-lg"
@@ -329,7 +338,8 @@ export default function HomePage() {
                   </Button>
                 </div>
               ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
 

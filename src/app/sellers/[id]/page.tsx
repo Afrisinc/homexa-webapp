@@ -20,6 +20,7 @@ import Link from "next/link";
 import { Seller, Product } from "@/lib/types";
 import { SellerDetailSkeleton } from "@/components/ui/skeleton";
 import { sellersService, productsService } from "@/services/api";
+import { useAuthStore } from "@/store/auth-store";
 
 interface SellerDetailPageProps {
   params: Promise<{
@@ -30,6 +31,7 @@ interface SellerDetailPageProps {
 export default function SellerDetailPage({ params }: SellerDetailPageProps) {
   const router = useRouter();
   const { id } = use(params);
+  const { isInitialized } = useAuthStore();
 
   // API state
   const [seller, setSeller] = useState<Seller | null>(null);
@@ -37,8 +39,11 @@ export default function SellerDetailPage({ params }: SellerDetailPageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch seller data and products from API
+  // Fetch seller data and products from API (wait for auth to initialize first)
   useEffect(() => {
+    // Wait for auth initialization before fetching
+    if (!isInitialized) return;
+
     const fetchSeller = async () => {
       try {
         setLoading(true);
@@ -66,7 +71,7 @@ export default function SellerDetailPage({ params }: SellerDetailPageProps) {
     };
 
     fetchSeller();
-  }, [id]);
+  }, [id, isInitialized]);
 
   // Loading state
   if (loading) {

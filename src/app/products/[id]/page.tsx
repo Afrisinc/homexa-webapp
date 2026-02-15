@@ -255,9 +255,10 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                     variant="outline"
                     size="sm"
                     asChild
+                    disabled={!isAuthenticated}
                     className="mt-4 w-full"
                   >
-                    <Link href={`/sellers/${seller.id}`}>
+                    <Link href={isAuthenticated ? `/sellers/${seller.id}` : "#"}>
                       View Seller Profile
                     </Link>
                   </Button>

@@ -111,10 +111,22 @@ class ApiClient {
    */
   async get<T>(endpoint: string, config?: RequestConfig): Promise<T> {
     const url = this.buildUrl(endpoint, config?.params);
+    const headers = this.buildHeaders(config?.headers);
+
+    // Debug: Log token injection for sellers endpoint
+    if (endpoint.includes('sellers')) {
+      const token = this.getAuthToken();
+      console.log('[API] Seller request:', {
+        endpoint,
+        hasToken: !!token,
+        tokenLength: token?.length || 0,
+        authHeaderSet: !!headers['Authorization'],
+      });
+    }
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: this.buildHeaders(config?.headers),
+      headers,
       ...config,
     });
 
@@ -190,14 +202,22 @@ class ApiClient {
   async upload<T>(endpoint: string, formData: FormData, config?: RequestConfig): Promise<T> {
     const url = this.buildUrl(endpoint, config?.params);
 
+    // Get authorization token separately (don't set Content-Type)
+    const token = this.getAuthToken();
+    const headers: Record<string, string> = {
+      ...config?.headers,
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
       method: 'POST',
       body: formData,
       ...config,
       // Don't set Content-Type header - browser will set it with boundary
-      headers: {
-        ...config?.headers,
-      },
+      headers,
     });
 
     return this.handleResponse<T>(response);
