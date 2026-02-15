@@ -116,11 +116,12 @@ class ApiClient {
     // Debug: Log token injection for sellers endpoint
     if (endpoint.includes('sellers')) {
       const token = this.getAuthToken();
+      const headersObj = headers as Record<string, string>;
       console.log('[API] Seller request:', {
         endpoint,
         hasToken: !!token,
         tokenLength: token?.length || 0,
-        authHeaderSet: !!headers['Authorization'],
+        authHeaderSet: !!headersObj['Authorization'],
       });
     }
 
@@ -204,9 +205,12 @@ class ApiClient {
 
     // Get authorization token separately (don't set Content-Type)
     const token = this.getAuthToken();
-    const headers: Record<string, string> = {
-      ...config?.headers,
-    };
+    const headers: Record<string, string> = {};
+
+    // Copy custom headers if provided
+    if (config?.headers && typeof config.headers === 'object' && !Array.isArray(config.headers)) {
+      Object.assign(headers, config.headers);
+    }
 
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
