@@ -7,7 +7,7 @@
     "build": "next build",
     "typecheck": "tsc --noEmit",
     "build:check": "pnpm typecheck && pnpm build",
-    "start": "next start -p 7000",
+    "start": "next start -p 7001",
     "lint": "next lint"
   },
   "dependencies": {

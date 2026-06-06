@@ -16,6 +16,6 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
-EXPOSE 7000
+EXPOSE 7001
 
-CMD ["node_modules/.bin/next", "start", "-p", "7000"]
+CMD ["node_modules/.bin/next", "start", "-p", "7001"]
