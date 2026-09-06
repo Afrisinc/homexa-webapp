@@ -499,4 +499,4 @@ For questions or issues:
 
 ---
 
-**Built with ❤️ using Next.js and TypeScript**
+**Built with ❤️ using Next.js and TypeScript - By Afrisinc**
