@@ -39,6 +39,8 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ secrets.GHCR_OWNER }}/homexa-webapp:latest
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL || 'https://api.homexa.rw' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
